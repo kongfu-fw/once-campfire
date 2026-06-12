@@ -5,7 +5,9 @@ class Messages::AttachmentPresentation
 
   def render
     if message.attachment.attached?
-      if message.attachment.previewable? || message.attachment.variable?
+      if message.attachment.audio?
+        render_audio
+      elsif message.attachment.previewable? || message.attachment.variable?
         render_preview
       else
         render_link
@@ -23,6 +25,10 @@ class Messages::AttachmentPresentation
       else
         lightboxed_image_preview_tag
       end
+    end
+
+    def render_audio
+      Messages::VoiceMessagePresentation.new(message, context: context).render
     end
 
     def video_preview_tag

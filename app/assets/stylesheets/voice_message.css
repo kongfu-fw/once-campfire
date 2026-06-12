@@ -1,0 +1,151 @@
+/* Voice Recorder */
+.voice-recorder {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 100%;
+  margin-block-end: var(--block-space);
+  z-index: 10;
+}
+
+.voice-recorder__content {
+  background-color: var(--color-bg);
+  border-radius: 1em;
+  padding: var(--block-space) var(--inline-space-double);
+  position: relative;
+}
+
+.voice-recorder__close-btn {
+  position: absolute;
+  inset-block-start: var(--block-space-half);
+  inset-inline-end: var(--inline-space);
+  --btn-size: 2em;
+}
+
+.voice-recorder__stop-square {
+  background-color: currentColor;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.voice-recorder__record-btn {
+  --btn-size: 4em;
+  --btn-background: var(--color-message-bg);
+  --btn-border-color: var(--color-border-darker);
+
+  transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+
+  &.voice-recorder__record-btn--active {
+    --btn-background: oklch(var(--lch-red) / 0.15);
+    --btn-border-color: var(--color-negative);
+
+    animation: voice-recorder-pulse 1.5s infinite;
+  }
+}
+
+.voice-recorder__hint {
+  user-select: none;
+}
+
+.voice-recorder__timer {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-negative);
+  font-weight: 600;
+}
+
+.voice-recorder__preview {
+  padding-block: var(--block-space-half);
+}
+
+.voice-recorder__duration {
+  font-variant-numeric: tabular-nums;
+}
+
+.composer__mic-btn {
+  --hover-filter: brightness(0.85);
+
+  @media (any-hover: hover) {
+    &:where(:not(:active):hover) {
+      filter: var(--hover-filter);
+      box-shadow: none;
+    }
+  }
+}
+
+/* Voice Message (chat playback) */
+.voice-message {
+  align-items: center;
+  background-color: var(--color-message-bg);
+  border-radius: 1em;
+  display: flex;
+  gap: var(--inline-space);
+  min-inline-size: 20ch;
+  padding: var(--block-space-half) var(--inline-space);
+
+  @media (prefers-color-scheme: dark) {
+    background-color: var(--color-border);
+  }
+}
+
+.voice-message__play-btn {
+  --btn-size: 2.2em;
+
+  font-size: 1.2em;
+}
+
+.voice-message__play-icon {
+  line-height: 1;
+}
+
+.voice-message__waveform {
+  align-items: center;
+  display: flex;
+  flex-grow: 1;
+  gap: 2px;
+  block-size: 1.8em;
+}
+
+.voice-message__bar {
+  background-color: var(--color-border-darker);
+  block-size: calc(30% + (var(--bar-index) * 5%));
+  border-radius: 1px;
+  display: block;
+  flex: 1;
+  max-block-size: 100%;
+  min-block-size: 15%;
+
+  &:nth-child(odd) {
+    block-size: calc(20% + (var(--bar-index) * 7%));
+  }
+
+  &:nth-child(3n) {
+    block-size: calc(50% + (var(--bar-index) * 3%));
+  }
+}
+
+.voice-message__duration {
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.voice-message__unplayed-dot {
+  background-color: var(--color-link);
+  block-size: 0.5em;
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
+  inline-size: 0.5em;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+/* Animation */
+@keyframes voice-recorder-pulse {
+  0%  { box-shadow: 0 0 0 0 oklch(var(--lch-red) / 0.3); }
+  70% { box-shadow: 0 0 0 0.6em oklch(var(--lch-red) / 0); }
+  100% { box-shadow: 0 0 0 0 oklch(var(--lch-red) / 0); }
+}

@@ -1,6 +1,9 @@
 <% content_for :footer do %>
   <div class="composer flex align-end gap position-relative"
-      data-controller="typing-notifications" data-typing-notifications-active-class="typing-indicator--active">
+      data-controller="typing-notifications voice-recorder"
+      data-typing-notifications-active-class="typing-indicator--active"
+      data-voice-recorder-form-url-value="<%= room_messages_path(room) %>"
+      data-voice-recorder-messages-outlet="#message-area">
     <%= link_to searches_path, class: "btn flex-item-no-shrink margin-block-end composer__context-btn", style: "view-transition-name: input-switcher" do %>
       <%= image_tag "search.svg", size: 20, aria: { hidden: "true" } %>
       <span class="for-screen-reader">Search</span>
@@ -30,6 +33,11 @@
                           composer_target: "text" } %>
                 </div>
 
+                <button class="btn btn--borderless txt-small flex-item-no-shrink composer__mic-btn" type="button" data-action="voice-recorder#toggle">
+                  <%= image_tag "microphone.svg", size: 22, class: "colorize--black", aria: { hidden: "true" } %>
+                  <span class="for-screen-reader">Record voice message</span>
+                </button>
+
                 <label class="btn btn--borderless txt-small flex-item-no-shrink composer__attachment-btn input--file">
                   <%= image_tag "attachment.svg", size: 22, class: "colorize--black", aria: { hidden: "true" } %>
                   <input type="file" data-action="composer#filePicked" multiple />
@@ -58,5 +66,48 @@
         <%= form.hidden_field :client_message_id, data: { composer_target: "clientid" } %>
       <% end %>
     </turbo-frame>
+
+    <div class="voice-recorder" data-voice-recorder-target="panel" hidden>
+      <div class="voice-recorder__content border shadow">
+        <button class="btn btn--plain voice-recorder__close-btn" type="button" data-action="voice-recorder#discard">
+          <%= image_tag "remove.svg", size: 20, class: "colorize--black", aria: { hidden: "true" } %>
+          <span class="for-screen-reader">Close</span>
+        </button>
+
+        <div class="voice-recorder__recording flex flex-column align-center gap" data-voice-recorder-target="recording">
+          <button class="voice-recorder__record-btn btn"
+                  type="button"
+                  data-voice-recorder-target="recordBtn"
+                  data-action="voice-recorder#toggleRecording">
+            <span data-voice-recorder-target="startIcon">
+              <%= image_tag "microphone.svg", size: 32, class: "colorize--black", aria: { hidden: "true" } %>
+            </span>
+            <span data-voice-recorder-target="stopIcon" hidden>
+              <div class="voice-recorder__stop-square"></div>
+            </span>
+            <span class="for-screen-reader">Toggle recording</span>
+          </button>
+          <span class="voice-recorder__timer txt-small" data-voice-recorder-target="timer" hidden>0:00</span>
+        </div>
+
+        <div class="voice-recorder__preview flex flex-column align-center gap" data-voice-recorder-target="preview" hidden>
+          <audio data-voice-recorder-target="audio"></audio>
+          <div class="flex full-width gap align-center">
+            <span class="voice-recorder__duration txt-small margin-inline-end-auto" data-voice-recorder-target="duration">0:00</span>
+          </div>
+
+          <div class="flex gap full-width">
+            <button class="btn flex-item-grow" type="button" data-action="voice-recorder#playPreview">
+              <span>▶</span>
+              <span>Play</span>
+            </button>
+            <button class="btn btn--reversed flex-item-grow" type="button" data-action="voice-recorder#send">
+              <%= image_tag "arrow-up.svg", size: 20, aria: { hidden: "true" } %>
+              <span>Send</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 <% end %>
