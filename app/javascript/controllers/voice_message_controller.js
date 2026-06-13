@@ -12,12 +12,25 @@ export default class extends Controller {
     }
 
     this.#loadDuration()
+
+    this.handlePlayingEvent = this.handlePlayingEvent.bind(this)
+    window.addEventListener("voice-message:playing", this.handlePlayingEvent)
   }
 
   disconnect() {
+    window.removeEventListener("voice-message:playing", this.handlePlayingEvent)
     if (this.#audio) {
       this.#audio.pause()
       this.#audio = null
+    }
+  }
+
+  handlePlayingEvent(event) {
+    if (event.detail.id !== this.idValue && this.#audio && !this.#audio.paused) {
+      this.#audio.pause()
+      this.#audio.currentTime = 0
+      this.playIconTarget.textContent = "▶"
+      this.element.classList.remove("is-playing")
     }
   }
 
@@ -32,8 +45,17 @@ export default class extends Controller {
       this.#audio = new Audio(this.urlValue)
       this.#audio.addEventListener("ended", () => {
         this.playIconTarget.textContent = "▶"
+        this.element.classList.remove("is-playing")
+      })
+      this.#audio.addEventListener("pause", () => {
+        this.element.classList.remove("is-playing")
+      })
+      this.#audio.addEventListener("play", () => {
+        this.element.classList.add("is-playing")
       })
     }
+
+    window.dispatchEvent(new CustomEvent("voice-message:playing", { detail: { id: this.idValue } }))
 
     this.playIconTarget.textContent = "⏸"
     this.#audio.play()

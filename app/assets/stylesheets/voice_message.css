@@ -2,23 +2,29 @@
 .voice-recorder {
   position: absolute;
   inset-inline: 0;
-  inset-block-end: 100%;
-  margin-block-end: var(--block-space);
+  inset-block-end: 0;
   z-index: 10;
 }
 
 .voice-recorder__content {
   background-color: var(--color-bg);
   border-radius: 1em;
-  padding: var(--block-space) var(--inline-space-double);
+  padding: calc(var(--block-space) + 3em) var(--inline-space-double) var(--block-space);
   position: relative;
 }
 
 .voice-recorder__close-btn {
   position: absolute;
-  inset-block-start: var(--block-space-half);
+  inset-block-start: var(--block-space);
   inset-inline-end: var(--inline-space);
-  --btn-size: 2em;
+  width: 2.5em;
+  height: 2.5em;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
 }
 
 .voice-recorder__stop-square {
@@ -52,7 +58,16 @@
 .voice-recorder__timer {
   font-variant-numeric: tabular-nums;
   color: var(--color-negative);
-  font-weight: 600;
+  font-weight: 300;
+  font-size: 3.0em;
+  line-height: 1;
+  min-inline-size: 3.5ch;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: 0.3em;
+  padding: 0.2em 0.4em;
+  background-color: var(--color-message-bg);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .voice-recorder__preview {
@@ -83,6 +98,7 @@
   gap: var(--inline-space);
   min-inline-size: 20ch;
   padding: var(--block-space-half) var(--inline-space);
+  cursor: pointer;
 
   @media (prefers-color-scheme: dark) {
     background-color: var(--color-border);
@@ -148,4 +164,17 @@
   0%  { box-shadow: 0 0 0 0 oklch(var(--lch-red) / 0.3); }
   70% { box-shadow: 0 0 0 0.6em oklch(var(--lch-red) / 0); }
   100% { box-shadow: 0 0 0 0 oklch(var(--lch-red) / 0); }
+}
+
+@keyframes voice-message-play {
+  0% { transform: scaleY(1); }
+  50% { transform: scaleY(0.4); }
+  100% { transform: scaleY(1); }
+}
+
+.voice-message.is-playing .voice-message__bar,
+.voice-message__waveform.is-playing .voice-message__bar {
+  animation: voice-message-play 1s infinite ease-in-out;
+  animation-delay: calc(var(--bar-index) * 0.1s);
+  transform-origin: center;
 }

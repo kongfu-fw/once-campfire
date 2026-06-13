@@ -7,7 +7,8 @@ class Messages::VoiceMessagePresentation
     tag.div class: "voice-message", data: {
       controller: "voice-message",
       voice_message_url_value: audio_url,
-      voice_message_id_value: message.id
+      voice_message_id_value: message.id,
+      action: "click->voice-message#play"
     } do
       play_button + waveform + duration + unplayed_dot
     end
@@ -18,7 +19,7 @@ class Messages::VoiceMessagePresentation
     delegate :tag, :image_tag, :rails_blob_path, to: :context
 
     def play_button
-      tag.button class: "voice-message__play-btn btn btn--plain", data: { action: "voice-message#play" } do
+      tag.button class: "voice-message__play-btn btn btn--plain", type: "button" do
         tag.span("▶", class: "voice-message__play-icon", data: { voice_message_target: "playIcon" }) +
         tag.span("Play voice message", class: "for-screen-reader")
       end

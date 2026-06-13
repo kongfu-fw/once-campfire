@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import FileUploader from "models/file_uploader"
 
 export default class extends Controller {
-  static targets = [ "panel", "recording", "preview", "audio", "timer", "duration", "recordBtn", "startIcon", "stopIcon" ]
+  static targets = [ "panel", "recording", "preview", "audio", "timer", "previewTimer", "recordBtn", "startIcon", "stopIcon", "playIcon", "pauseIcon" ]
   static values = { formUrl: String }
   static outlets = [ "messages" ]
 
@@ -14,6 +14,10 @@ export default class extends Controller {
   #recordedUrl
   #recordingDurationSeconds = 0
   #isDiscarding = false
+
+  connect() {
+    // Audio event listeners are now handled via data-actions on the audio tag
+  }
 
   disconnect() {
     this.#cleanup()
@@ -76,7 +80,6 @@ export default class extends Controller {
       this.recordBtnTarget.classList.add("voice-recorder__record-btn--active")
       this.startIconTarget.hidden = true
       this.stopIconTarget.hidden = false
-      this.timerTarget.hidden = false
     }).catch(() => {
       // Permission denied or no microphone
     })
@@ -94,8 +97,34 @@ export default class extends Controller {
 
   playPreview() {
     const audio = this.audioTarget
-    audio.currentTime = 0
-    audio.play()
+    if (audio.paused) {
+      if (audio.currentTime >= audio.duration) audio.currentTime = 0
+      audio.play()
+    } else {
+      audio.pause()
+    }
+  }
+
+  onPlay() {
+    this.playIconTarget.hidden = true
+    this.pauseIconTarget.hidden = false
+  }
+
+  onPause() {
+    this.playIconTarget.hidden = false
+    this.pauseIconTarget.hidden = true
+  }
+
+  onEnded() {
+    this.playIconTarget.hidden = false
+    this.pauseIconTarget.hidden = true
+    this.previewTimerTarget.textContent = this.#formatTime(this.#recordingDurationSeconds)
+  }
+
+  onTimeUpdate() {
+    if (!this.audioTarget.paused) {
+      this.previewTimerTarget.textContent = this.#formatTime(Math.floor(this.audioTarget.currentTime))
+    }
   }
 
   discard() {
@@ -119,7 +148,10 @@ export default class extends Controller {
     const uploader = new FileUploader(file, this.formUrlValue, clientMessageId, this.#uploadProgress.bind(this))
 
     const body = this.#pendingUploadBody()
-    await this.messagesOutlet.insertPendingMessage(clientMessageId, body)
+    this.messagesOutlet.insertPendingMessage(clientMessageId, body)
+
+    this.audioTarget.pause()
+    this.#reset()
 
     try {
       const resp = await uploader.upload()
@@ -127,8 +159,6 @@ export default class extends Controller {
     } catch {
       this.messagesOutlet.failPendingMessage(clientMessageId)
     }
-
-    this.#reset()
   }
 
   // Private
@@ -143,7 +173,7 @@ export default class extends Controller {
     this.recordingTarget.hidden = true
     this.previewTarget.hidden = false
 
-    this.durationTarget.textContent = this.#formatTime(this.#recordingDurationSeconds)
+    this.previewTimerTarget.textContent = this.#formatTime(this.#recordingDurationSeconds)
   }
 
   #startTimer() {
@@ -153,6 +183,10 @@ export default class extends Controller {
     this.#timerInterval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - this.#startTime) / 1000)
       this.timerTarget.textContent = this.#formatTime(elapsed)
+
+      if (elapsed >= 59) {
+        this.stopRecording()
+      }
     }, 1000)
   }
 
@@ -216,7 +250,6 @@ export default class extends Controller {
     this.panelTarget.hidden = true
     this.previewTarget.hidden = true
     this.recordingTarget.hidden = false
-    this.timerTarget.hidden = true
     this.timerTarget.textContent = "0:00"
     if (this.hasStartIconTarget) this.startIconTarget.hidden = false
     if (this.hasStopIconTarget) this.stopIconTarget.hidden = true

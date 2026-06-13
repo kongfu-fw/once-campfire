@@ -75,35 +75,50 @@
         </button>
 
         <div class="voice-recorder__recording flex flex-column align-center gap" data-voice-recorder-target="recording">
-          <button class="voice-recorder__record-btn btn"
-                  type="button"
-                  data-voice-recorder-target="recordBtn"
-                  data-action="voice-recorder#toggleRecording">
-            <span data-voice-recorder-target="startIcon">
-              <%= image_tag "microphone.svg", size: 32, class: "colorize--black", aria: { hidden: "true" } %>
-            </span>
-            <span data-voice-recorder-target="stopIcon" hidden>
-              <div class="voice-recorder__stop-square"></div>
-            </span>
-            <span class="for-screen-reader">Toggle recording</span>
-          </button>
-          <span class="voice-recorder__timer txt-small" data-voice-recorder-target="timer" hidden>0:00</span>
+          <div class="flex align-center full-width">
+            <div class="flex-item-grow flex justify-end" style="padding-inline-end: 1em;">
+              <span class="voice-recorder__timer" data-voice-recorder-target="timer">0:00</span>
+            </div>
+            <button class="voice-recorder__record-btn btn flex-shrink-0"
+                    type="button"
+                    data-voice-recorder-target="recordBtn"
+                    data-action="voice-recorder#toggleRecording">
+              <span data-voice-recorder-target="startIcon">
+                <%= image_tag "microphone.svg", size: 32, class: "colorize--black", aria: { hidden: "true" } %>
+              </span>
+              <span data-voice-recorder-target="stopIcon" hidden>
+                <div class="voice-recorder__stop-square"></div>
+              </span>
+              <span class="for-screen-reader">Toggle recording</span>
+            </button>
+            <div class="flex-item-grow"></div>
+          </div>
+          <span class="voice-recorder__hint txt-small txt-subtle">Max length: 59s</span>
         </div>
 
-        <div class="voice-recorder__preview flex flex-column align-center gap" data-voice-recorder-target="preview" hidden>
-          <audio data-voice-recorder-target="audio"></audio>
-          <div class="flex full-width gap align-center">
-            <span class="voice-recorder__duration txt-small margin-inline-end-auto" data-voice-recorder-target="duration">0:00</span>
-          </div>
+        <div class="voice-recorder__preview flex flex-column gap" data-voice-recorder-target="preview" hidden>
+          <audio data-voice-recorder-target="audio"
+                 data-action="play->voice-recorder#onPlay pause->voice-recorder#onPause timeupdate->voice-recorder#onTimeUpdate ended->voice-recorder#onEnded"></audio>
 
-          <div class="flex gap full-width">
-            <button class="btn flex-item-grow" type="button" data-action="voice-recorder#playPreview">
-              <span>▶</span>
-              <span>Play</span>
+          <div class="flex align-center justify-center full-width" style="gap: 2rem;">
+            <button class="btn btn--plain" type="button" data-action="voice-recorder#playPreview" style="width: 4em; height: 4em; border-radius: 50%; background: var(--color-bg); border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center;">
+              <span data-voice-recorder-target="playIcon" style="padding-inline-start: 4px; line-height: 0;">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <polygon points="6,3 17,10 6,17"></polygon>
+                </svg>
+              </span>
+              <span data-voice-recorder-target="pauseIcon" style="line-height: 0;" hidden>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <rect x="5" y="3" width="3" height="14"></rect>
+                  <rect x="12" y="3" width="3" height="14"></rect>
+                </svg>
+              </span>
             </button>
-            <button class="btn btn--reversed flex-item-grow" type="button" data-action="voice-recorder#send">
-              <%= image_tag "arrow-up.svg", size: 20, aria: { hidden: "true" } %>
-              <span>Send</span>
+
+            <span class="voice-recorder__timer" data-voice-recorder-target="previewTimer">0:00</span>
+
+            <button class="btn btn--reversed" type="button" data-action="voice-recorder#send" style="width: 4em; height: 4em; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center;">
+              <%= image_tag "arrow-up.svg", size: 24, aria: { hidden: "true" } %>
             </button>
           </div>
         </div>
