@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    container_name: campfire_app
+    ports:
+      - "8080:80"
+    environment:
+      - SECRET_KEY_BASE=dummy_key_base_for_dev_mode_only_123
+      - DISABLE_SSL=1
+    volumes:
+      - campfire_data:/rails/storage
+    restart: unless-stopped
+
+volumes:
+  campfire_data:
